@@ -8,7 +8,6 @@ from extension import Convertor, ConverterException
 
 import yfinance as yfin
 
-
 # Taking my API_KEY from .env
 dotenv_path = Path('./.env')
 load_dotenv(dotenv_path=dotenv_path)
@@ -20,7 +19,7 @@ bot = telebot.TeleBot(API_KEY)
 
 @bot.message_handler(commands=['help', 'start', '?'])
 def greet(message):
-	bot.reply_to(message, "/stock - for trending tickers last 2 days\nprice (any stock name) - show current price of stock(4 last minutes) - e.g.: price nflx\n Aso works great for cryptocurrency\n /help for this help-message")
+	bot.reply_to(message, "/currency - available currency to excahge \n e.g.: dollar euro 100 \n /stock - for trending tickers last 2 days\nprice (any stock name) - show current price of stock(4 last minutes) - e.g.: price nflx\n Aso works great for cryptocurrency\n /help for this help-message")
 
 
 @bot.message_handler(commands=['currency'])
