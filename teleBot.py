@@ -2,7 +2,8 @@ import os
 import telebot
 from dotenv import load_dotenv
 from pathlib import Path
-
+from currency import exchange
+from extension import Convertor, ConverterException
 # https://finance.yahoo.com/
 
 import yfinance as yfin
@@ -13,11 +14,38 @@ dotenv_path = Path('./.env')
 load_dotenv(dotenv_path=dotenv_path)
 
 API_KEY=os.getenv('API_KEY')
+
+
 bot = telebot.TeleBot(API_KEY)
 
-@bot.message_handler(commands=['help'])
+@bot.message_handler(commands=['help', 'start', '?'])
 def greet(message):
 	bot.reply_to(message, "/stock - for trending tickers last 2 days\nprice (any stock name) - show current price of stock(4 last minutes) - e.g.: price nflx\n Aso works great for cryptocurrency\n /help for this help-message")
+
+
+@bot.message_handler(commands=['currency'])
+def values(message: telebot.types.Message):
+	text = 'Available currency:\n'
+	text += '\n'.join(str(key) for key in exchange.keys())
+	bot.send_message(message.chat.id, text)
+
+
+@bot.message_handler(content_types=['text'])
+def values(message: telebot.types.Message):
+	values = message.text.split(' ')
+	values = list(map(str.lower, values))
+
+	try:
+		result = Convertor.get_price(values)
+	except ConverterException as e:
+		bot.reply_to(message,e)
+	except Exception as e:
+		bot.reply_to(message,e)
+	else:
+		text = f'PRICE {values[0]} {values[1]} in {values[2]} -- {result} {exchange[values[1]]}'
+		bot.reply_to(message, text)
+
+
 
 @bot.message_handler(commands=['hello'])
 def greet(message):
@@ -75,4 +103,4 @@ def send_price(message):
   else:
     bot.send_message(message.chat.id, "No data!")
 
-bot.polling()
+bot.polling(none_stop=True, interval=0)
